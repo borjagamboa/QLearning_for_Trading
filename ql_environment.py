@@ -34,14 +34,15 @@ class TradingEnvironment:
     def calculate_reward(self, action, current_close):
         reward = 0
         if action == 0:  # Buy
-            self.holdings = current_close/self.cash_in_hand
+            self.holdings = self.cash_in_hand/current_close
             self.states_buy.append(self.data.index[self.current_step])
+            self.bought_price = current_close
             self.cash_in_hand = 0
         elif action == 2:  # Sell
             self.cash_in_hand = self.holdings*current_close
             self.states_sell.append(self.data.index[self.current_step])
+            reward = max(self.holdings * (current_close - self.bought_price), 0)
             self.holdings = 0
-            reward = max(self.holdings*(current_close - self.bought_price), 0)
         return reward
 
     def _get_state(self):
